@@ -101,6 +101,18 @@ GameManager.prototype.moveTile = function (tile, cell) {
   tile.updatePosition(cell);
 };
 
+function gcd(x,y) {
+  while (x !== y) {
+    if (x > y) x = x - y;
+    else y = y - x;
+  }
+  return x;
+}
+
+canMerge = function(val1,val2) {
+  return val1 === val2 || gcd(val1,val2) > 1;
+}
+
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2:down, 3: left
@@ -128,9 +140,9 @@ GameManager.prototype.move = function (direction) {
         var next      = self.grid.cellContent(positions.next);
 
         // Only one merger per row traversal?
-        if (next && next.value === tile.value && !next.mergedFrom) {
-          var merged = new Tile(positions.next, tile.value * 1);
-          merged.mergedFrom = [tile, next];
+        if (next && canMerge(next.value,tile.value) && !next.mergedFrom) {
+          var merged = new Tile(positions.next, gcd(tile.value,next.value));
+            //tile.value + next.value);
 
           self.grid.insertTile(merged);
           self.grid.removeTile(tile);
